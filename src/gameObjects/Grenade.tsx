@@ -2,20 +2,19 @@ import { useRef } from "react";
 import { Vector, Rectangle, RectangleBoundary } from "../helpers/shapes";
 
 interface GrenadeProps {
-  frame: number;
   deltaTime: number;
   boundaries: RectangleBoundary[];
 }
 
 const gravityPixelsPerSecond2 = 100;
-const speedLosePerSecond = 0.2;
+const speedLosePerSecond = 0.1;
 const repulsionInPixels = 1;
 
 export default function Grenade(props: GrenadeProps) {
   const deltaTimeInSeconds = props.deltaTime / 1000;
 
   const currentSpeed = useRef(new Vector(100, 0));
-  const currentPosition = useRef(new Rectangle(25, 25, 100, 100));
+  const currentPosition = useRef(new Rectangle(25, 25, 25, 25));
 
   const nextSpeed = currentSpeed.current.getCopy();
   const nextPosition = currentPosition.current.getCopy();
@@ -57,9 +56,7 @@ export default function Grenade(props: GrenadeProps) {
           break;
         }
       }
-      console.log(nextSpeed)
       nextSpeed.change(xSpeedSign * nextSpeed.x, ySpeedSign * nextSpeed.y * speedLose);
-      console.log(nextSpeed)
       nextPosition.change(
         nextPosition.x + nextSpeed.x * deltaTimeInSeconds,
         nextPosition.y + nextSpeed.y * deltaTimeInSeconds
