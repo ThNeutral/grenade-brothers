@@ -46,7 +46,7 @@ export class RectangleBoundary extends Rectangle {
     public y: number,
     public width: number,
     public height: number,
-    public side: "top" | "bottom" | "left" | "right"
+    public side: "top" | "bottom" | "left" | "right" | "player1-field" | "player2-field"
   ) {
     super(x, y, width, height);
   }

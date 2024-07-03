@@ -1,9 +1,14 @@
 import { useRef } from "react";
 import { Vector, Rectangle, RectangleBoundary } from "../helpers/shapes";
+import { GameStates } from "../components/GameLoop";
 
 interface GrenadeProps {
   deltaTime: number;
   boundaries: RectangleBoundary[];
+  gameState: GameStates;
+  player1ScoreIncrement: () => void;
+  player2ScoreIncrement: () => void;
+  changeGameState: (state: GameStates) => void;
 }
 
 const gravityPixelsPerSecond2 = 100;
@@ -13,8 +18,21 @@ const repulsionInPixels = 1;
 export default function Grenade(props: GrenadeProps) {
   const deltaTimeInSeconds = props.deltaTime / 1000;
 
-  const currentSpeed = useRef(new Vector(100, 0));
-  const currentPosition = useRef(new Rectangle(25, 25, 25, 25));
+  const currentSpeed = useRef(new Vector(Math.random() < 0.5 ? -100 : 100, 0));
+  const currentPosition = useRef(new Rectangle(412.5, 100, 25, 25));
+
+  if (props.gameState === GameStates.reset) {
+    currentSpeed.current = new Vector(Math.random() < 0.5 ? -100 : 100, 0);
+    currentPosition.current = new Rectangle(412.5, 100, 25, 25);
+    props.changeGameState(GameStates.playing);
+    return <div style={getStyle(currentPosition.current)}></div>;
+  }
+
+  if (props.gameState === GameStates.end) {
+    currentSpeed.current = new Vector(Math.random() < 0.5 ? -100 : 100, 0);
+    currentPosition.current = new Rectangle(412.5, 100, 25, 25);
+    return <div style={getStyle(currentPosition.current)}></div>;
+  }
 
   const nextSpeed = currentSpeed.current.getCopy();
   const nextPosition = currentPosition.current.getCopy();
@@ -24,7 +42,6 @@ export default function Grenade(props: GrenadeProps) {
     nextSpeed.x,
     nextSpeed.y + gravityPixelsPerSecond2 * deltaTimeInSeconds
   );
-
 
   let isIntersection = false;
   for (const boundary of props.boundaries) {
@@ -55,8 +72,19 @@ export default function Grenade(props: GrenadeProps) {
           xPosShift = -1;
           break;
         }
+        case "player1-field": {
+          props.player1ScoreIncrement();
+          break;
+        }
+        case "player2-field": {
+          props.player2ScoreIncrement();
+          break;
+        }
       }
-      nextSpeed.change(xSpeedSign * nextSpeed.x, ySpeedSign * nextSpeed.y * speedLose);
+      nextSpeed.change(
+        xSpeedSign * nextSpeed.x,
+        ySpeedSign * nextSpeed.y * speedLose
+      );
       nextPosition.change(
         nextPosition.x + nextSpeed.x * deltaTimeInSeconds,
         nextPosition.y + nextSpeed.y * deltaTimeInSeconds
